@@ -18,23 +18,24 @@ let tipo = ""; // cliente ou funcionario
 
 // Listas simuladas
 let clientes = [
-  new Cliente("1", "ana", "24/07/2004", "1234", "ana@email.com", "123")
+  new Cliente(0, "ana", "24/07/2004", "1234", "ana@email.com", "123")
 ];
 let funcionarios = [
-  new Funcionario("1", "joao", "9999", "joao@email.com", "123")
+  new Funcionario(0, "joao", "9999", "joao@email.com", "123")
 ];
 
 // Lista com os quartos
-let quartocasal = [
-  new Quartos('1', 'RS250', 2, 'Casal', 'Quarto perfeito para o casal!')
-]
-let quartofamilia = [
-  new Quartos('2', 'RS350', 2, 'Família', 'Quarto que possui 1 cama de casal e 1 de solteiro')
+let tiposDeQuartos = [
+  new Quartos(1, '1', 'RS250', 2, 'Casal', 'Quarto perfeito para o casal!'),
+
+  new Quartos(2, '2', 'RS350', 2, 'Família', 'Quarto que possui 1 cama de casal e 1 de solteiro')
 ]
 
+//quero q o total de quartos de casal seja 2 e de familia 2 também
+
 let reservas = [
-  new Reserva('1', '1', 'status', '1/1', '1,2'),
-  new Reserva('2', '1', 'ble', '2/2', '3/2')
+  new Reserva(0, 0, 1, 'pendente', '1/1', '1,2'),
+  new Reserva(1, 0, 2, 'realizada', '2/2', '3/2')
 ]
 
 // Início do programa
@@ -99,28 +100,30 @@ function fazerLogin() {
           console.log("7. Ver Lista de Clientes");
           console.log("8. Mudar status da reserva");
           console.log("9. Adicionar Quarto");
-          rl.question("Escolha uma opção : ", function(Flogado){
-            if (Flogado === '4') {
+          rl.question("Escolha uma opção : ", function(funcionarioLogado){
+            if (funcionarioLogado === '4') {
                 console.log(funcionarios[i])
-                rl.close()
+                finalizouAcaoFuncionario(funcionarioEncontrado)
             }
-            else if (Flogado === '5'){
+            else if (funcionarioLogado === '5'){
                 console.log(reservas)
-                rl.close()
+                finalizouAcaoFuncionario(funcionarioEncontrado)
             }
-            else if (Flogado === '6'){
-                console.log(quartocasal, quartofamilia)
-                rl.close()
+            else if (funcionarioLogado === '6'){
+                console.log(tiposDeQuartos)
+                finalizouAcaoFuncionario(funcionarioEncontrado)
             }
-            else if (Flogado === '7'){
+            else if (funcionarioLogado === '7'){
                 console.log(clientes)
-                rl.close()
+                finalizouAcaoFuncionario(funcionarioEncontrado)
             }
-            else if (Flogado === '8'){
+            else if (funcionarioLogado === '8'){
                 console.log('alterar reserva')
+                finalizouAcaoFuncionario(funcionarioEncontrado)
             }
-            else if (Flogado === '9'){
-                console.log('lista de reserva')
+            else if (funcionarioLogado === '9'){
+                console.log('adicionar quarto')
+                finalizouAcaoFuncionario(funcionarioEncontrado)
             }
           })
         } else {
@@ -150,7 +153,7 @@ function fazerLogin() {
               finalizouAcaoCliente(clienteEncontrado);
             }
             else if (clienteLogado === '2'){
-              console.log(quartocasal, quartofamilia);
+              console.log(tiposDeQuartos);
               finalizouAcaoCliente(clienteEncontrado);
             }
             else if (clienteLogado === '3'){
@@ -185,7 +188,7 @@ function fazerLogin() {
 // Cadastro de cliente ou funcionário
 function fazerCadastro() {
   if (tipo === "funcionario") {
-    rl.question("ID: ", function(id) {
+    var id = funcionarios.length
       rl.question("Nome de usuário: ", function(nome) {
         rl.question("CPF: ", function(cpf) {
           rl.question("Email: ", function(email) {
@@ -200,10 +203,10 @@ function fazerCadastro() {
           });
         });
       });
-    });
+    
 
   } else { // cliente
-    rl.question("ID: ", function(id) {
+    var id = clientes.length
       rl.question("Nome: ", function(nome) {
         rl.question("Data de nascimento: ", function(dataNasc) {
           rl.question("CPF: ", function(cpf) {
@@ -212,31 +215,77 @@ function fazerCadastro() {
                 var novoCliente = new Cliente(id, nome, dataNasc, cpf, email, senha);
                 clientes.push(novoCliente);
                 console.log("Cliente cadastrado com sucesso!");
-                finalizouAcaoCliente();
+                iniciar();
               });
             });
           });
         });
       });
-    });
+    
   }
 }
 
 function fazerReserva(clienteEncontrado){ 
-  rl.question('ID único: ', function(IdUnico){
-    rl.question('ID do cliente: ', function(IdCliente){
-      rl.question('Data de chek-in: ', function(DataIn){
-        rl.question('Data de check-out: ', function(DataOut){
-          var novaReserva = new Reserva(IdUnico, IdCliente,'Realizada', DataIn, DataOut);
-          // quando a reserva é feita o status deve ser 'realidada'
-          reservas.push(novaReserva);
-          console.log("Reserva realizada com sucesso!");
-          console.log(reservas)
-          finalizouAcaoCliente(clienteEncontrado);
+  var IdUnico = reservas.length;
+  if (clienteEncontrado.id == 0){
+    //clienteEncontrado.id qnd o id é igual a 0 ve como undefined
+    var IdCliente = 0
+  }
+  else {
+    var IdCliente = clienteEncontrado.id
+  }
+ 
+      console.log(tiposDeQuartos)
+      rl.question('Qual tipo de quarto você deseja?(id Quarto) ', function(r){
+        if (r == 1){
+          console.log("Menos 1 quarto de casal!")
+          //quero descontar da quantidade de quartos de casal
+          for (var h = 0; h < tiposDeQuartos.length; h++ ){
+            
+            if (tiposDeQuartos[h].idQuarto == 1){
+              tiposDeQuartos[h].QntDisp = tiposDeQuartos[h].QntDisp - 1;
+              console.log(tiposDeQuartos[h].QntDisp);
+            }
+          }
+          rl.question("Digite a data de checkin: ", function(DataIn){
+          rl.question('Digite a data de checkout: ', function(DataOut){
+            var novaReserva = new Reserva(IdUnico, IdCliente, r, 'Realizada', DataIn, DataOut);
+            // quando a reserva é feita o status deve ser 'realizada'
+            reservas.push(novaReserva);
+            console.log("Reserva realizada com sucesso!");
+            finalizouAcaoCliente(clienteEncontrado);
+
+          })
         })
-      })
-    })
-  })
+        }  
+        else if(r==2){
+          console.log('menos um quarto família!')
+          for (var h = 0; h < tiposDeQuartos.length; h++ ){
+            
+            if (tiposDeQuartos[h].idQuarto == 2){
+              tiposDeQuartos[h].QntDisp = tiposDeQuartos[h].QntDisp - 1;
+              console.log(tiposDeQuartos[h].QntDisp);
+            }
+          }
+          rl.question("Digite a data de checkin: ", function(DataIn){
+          rl.question('Digite a data de checkout: ', function(DataOut){
+            var novaReserva = new Reserva(IdUnico, IdCliente, r, 'Realizada', DataIn, DataOut);
+            // quando a reserva é feita o status deve ser 'realizada'
+            reservas.push(novaReserva);
+            console.log("Reserva realizada com sucesso!");
+            console.log(reservas)
+            finalizouAcaoCliente(clienteEncontrado);
+
+          })
+        })
+
+        }
+        
+        
+        })
+            
+    
+  
 
 }
 
@@ -312,11 +361,11 @@ function finalizouAcaoCliente(clienteEncontrado){
 
             }
             else if (clienteLogado === '2'){
-              console.log(quartocasal, quartofamilia)
+              console.log(tiposDeQuartos)
               finalizouAcaoCliente(clienteEncontrado)
             }
             else if (clienteLogado === '3'){
-              fazerReserva();
+              fazerReserva(clienteEncontrado);
             }
             else if (clienteLogado === '4'){
               excluirReserva(clienteEncontrado);
@@ -333,6 +382,54 @@ function finalizouAcaoCliente(clienteEncontrado){
           })
     }
   })
+}
+
+function finalizouAcaoFuncionario(funcionarioEncontrado){
+  rl.question('Quer sair do programa?(s/n) ', function(res){
+    if (res === 's'){
+      console.log('Programa fechado!');
+      rl.close();
+    }
+    else if (res === 'n'){
+      console.log("4. Ver Meus Dados");
+          console.log("5. Ver Lista de Reservas");
+          console.log("6. Ver Lista de Quartos");
+          console.log("7. Ver Lista de Clientes");
+          console.log("8. Mudar status da reserva");
+          console.log("9. Adicionar Quarto");
+          rl.question("Escolha uma opção : ", function(funcionarioLogado){
+            if (funcionarioLogado === '4') {
+                console.log(funcionarios[i])
+                finalizouAcaoFuncionario(funcionarioEncontrado)
+            }
+            else if (funcionarioLogado === '5'){
+                console.log(reservas)
+                finalizouAcaoFuncionario(funcionarioEncontrado)
+            }
+            else if (funcionarioLogado === '6'){
+                console.log(tiposDeQuartos)
+                finalizouAcaoFuncionario(funcionarioEncontrado)
+            }
+            else if (funcionarioLogado === '7'){
+                console.log(clientes)
+                finalizouAcaoFuncionario(funcionarioEncontrado)
+            }
+            else if (funcionarioLogado === '8'){
+                console.log('alterar reserva')
+                finalizouAcaoFuncionario(funcionarioEncontrado)
+            }
+            else if (funcionarioLogado === '9'){
+                console.log('lista de reserva')
+                finalizouAcaoFuncionario(funcionarioEncontrado)
+            }
+          })
+        } else {
+          console.log("Credenciais inválidas.");
+          rl.close();
+        
+
+    }
+  } )
 }
 
 iniciar();
