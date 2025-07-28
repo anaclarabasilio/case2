@@ -3,7 +3,7 @@ const Cliente = require("./classes/Cliente");
 const Funcionario = require("./classes/Funcionario");
 const Quartos = require("./classes/Quartos");
 const Reserva = require("./classes/Reserva");
-const Sistema = require("./classes/Sistema");
+
 
 
 // conseguir exibir uma pergunta na tela
@@ -23,6 +23,18 @@ let clientes = [
 let funcionarios = [
   new Funcionario("1", "joao", "9999", "joao@email.com", "123")
 ];
+
+// Lista com os quartos
+let quartocasal = [
+  new Quartos('1', 'RS250', 2, 'Casal', 'Quarto perfeito para o casal!')
+]
+let quartofamilia = [
+  new Quartos('2', 'RS350', 2, 'Família', 'Quarto que possui 1 cama de casal e 1 de solteiro')
+]
+
+let reservas = [
+  new Reserva('1', '1', 'status', '1/1', '1,2')
+]
 
 // Início do programa
 function iniciar() {
@@ -68,7 +80,7 @@ function fazerLogin() {
         var funcionarioEncontrado = null;
         // Guarda o funcionário com o login certo
         for (var i = 0; i < funcionarios.length; i++) {
-            // Percorre todos os nomes de funcionarios na lista
+            // Percorre cada lista de funcionário
           if (funcionarios[i].nomeUsuario === usuario && funcionarios[i].senha === senha) {
           // funcionarios[i].nomeUsuario - percorre em cada lista o atributo nome do funcionario  
             funcionarioEncontrado = funcionarios[i];
@@ -86,25 +98,27 @@ function fazerLogin() {
           console.log("7. Ver Lista de Clientes");
           console.log("8. Mudar status da reserva");
           console.log("9. Adicionar Quarto");
-          rl.question("Escolha uma opção : ", function(logado){
-            if (logado === '4') {
+          rl.question("Escolha uma opção : ", function(Flogado){
+            if (Flogado === '4') {
                 console.log(funcionarios[i])
                 rl.close()
             }
-            else if (logado === '5'){
-                console.log('lista de reserva')
+            else if (Flogado === '5'){
+                console.log(reservas)
+                rl.close()
             }
-            else if (logado === '6'){
-                console.log('lista de quartos')
+            else if (Flogado === '6'){
+                console.log(quartocasal, quartofamilia)
+                rl.close()
             }
-            else if (logado === '7'){
+            else if (Flogado === '7'){
                 console.log(clientes)
                 rl.close()
             }
-            else if (logado === '8'){
+            else if (Flogado === '8'){
                 console.log('alterar reserva')
             }
-            else if (logado === '9'){
+            else if (Flogado === '9'){
                 console.log('lista de reserva')
             }
           })
@@ -129,7 +143,36 @@ function fazerLogin() {
           console.log("3. Fazer Reserva");
           console.log("4. Cancelar Reserva");
           console.log("5. Ver Minhas Reservas");
-          rl.close();
+          rl.question("Escolha um número: ", function(Clogado){
+            if (Clogado === '1'){
+              console.log(clientes[j])
+            }
+            else if (Clogado === '2'){
+              console.log(quartocasal, quartofamilia)
+            }
+            else if (Clogado === '3'){
+              fazerReserva();
+            }
+            else if (Clogado === '4'){
+
+            }
+            else if (Clogado === '5'){
+              for ( var i = 0; i < reservas.length; i++) {
+                // percorre cada reserva
+                if(reservas[i].IdCliente === clientes[j].id){
+                // se o id do cliente na reserva for igual o id do cliente no login
+                  console.log(reservas[i])
+                  // imprime suas reservas
+                }
+              }
+              rl.close()
+            }
+            else {
+              console.log('Não existe essa opção.')
+              // tenho que colocar para perguntar de novo o número
+            }
+
+          })
         } else {
           console.log("Credenciais inválidas.");
           rl.close();
@@ -177,6 +220,23 @@ function fazerCadastro() {
       });
     });
   }
+}
+
+function fazerReserva(){ 
+  rl.question('ID único: ', function(IdUnico){
+    rl.question('ID do cliente: ', function(IdCliente){
+      rl.question('Data de chek-in: ', function(DataIn){
+        rl.question('Data de check-out: ', function(DataOut){
+          var novaReserva = new Reserva(IdUnico, IdCliente,'Realizada', DataIn, DataOut);
+          // quando a reserva é feita o status ter ser 'realidada'
+          reservas.push(novaReserva);
+          console.log("Reserva realizada com sucesso!");
+          iniciar();
+        })
+      })
+    })
+  })
+
 }
 
 iniciar();
