@@ -1,6 +1,9 @@
 const readline = require("readline");
 const Cliente = require("./classes/Cliente");
 const Funcionario = require("./classes/Funcionario");
+const Quartos = require("./classes/Quartos");
+const Reserva = require("./classes/Reserva");
+const Sistema = require("./classes/Sistema");
 
 
 // conseguir exibir uma pergunta na tela
@@ -75,7 +78,7 @@ function fazerLogin() {
         }
 
         if (funcionarioEncontrado) {
-        // Se funcionsrioEncontrado não for nulo    
+        // Se funcionarioEncontrado não for nulo    
           console.log("\nLogin realizado com sucesso!\n");
           console.log("4. Ver Meus Dados");
           console.log("5. Ver Lista de Reservas");
@@ -83,7 +86,28 @@ function fazerLogin() {
           console.log("7. Ver Lista de Clientes");
           console.log("8. Mudar status da reserva");
           console.log("9. Adicionar Quarto");
-          rl.close();
+          rl.question("Escolha uma opção : ", function(logado){
+            if (logado === '4') {
+                console.log(funcionarios[i])
+                rl.close()
+            }
+            else if (logado === '5'){
+                console.log('lista de reserva')
+            }
+            else if (logado === '6'){
+                console.log('lista de quartos')
+            }
+            else if (logado === '7'){
+                console.log(clientes)
+                rl.close()
+            }
+            else if (logado === '8'){
+                console.log('alterar reserva')
+            }
+            else if (logado === '9'){
+                console.log('lista de reserva')
+            }
+          })
         } else {
           console.log("Credenciais inválidas.");
           rl.close();
