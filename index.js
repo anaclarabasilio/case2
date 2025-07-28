@@ -33,7 +33,8 @@ let quartofamilia = [
 ]
 
 let reservas = [
-  new Reserva('1', '1', 'status', '1/1', '1,2')
+  new Reserva('1', '1', 'status', '1/1', '1,2'),
+  new Reserva('2', '1', 'ble', '2/2', '3/2')
 ]
 
 // Início do programa
@@ -143,32 +144,31 @@ function fazerLogin() {
           console.log("3. Fazer Reserva");
           console.log("4. Cancelar Reserva");
           console.log("5. Ver Minhas Reservas");
-          rl.question("Escolha um número: ", function(Clogado){
-            if (Clogado === '1'){
-              console.log(clientes[j])
+          rl.question("Escolha um número: ", function(clienteLogado){
+            if (clienteLogado === '1'){
+              console.log(clientes[j]);
+              finalizouAcaoCliente(clienteEncontrado);
             }
-            else if (Clogado === '2'){
-              console.log(quartocasal, quartofamilia)
+            else if (clienteLogado === '2'){
+              console.log(quartocasal, quartofamilia);
+              finalizouAcaoCliente(clienteEncontrado);
             }
-            else if (Clogado === '3'){
-              fazerReserva();
+            else if (clienteLogado === '3'){
+              fazerReserva(clienteEncontrado);
+              
             }
-            else if (Clogado === '4'){
-
+            else if (clienteLogado === '4'){
+              excluirReserva(clienteEncontrado);
+              
             }
-            else if (Clogado === '5'){
-              for ( var i = 0; i < reservas.length; i++) {
-                // percorre cada reserva
-                if(reservas[i].IdCliente === clientes[j].id){
-                // se o id do cliente na reserva for igual o id do cliente no login
-                  console.log(reservas[i])
-                  // imprime suas reservas
-                }
-              }
-              rl.close()
+            else if (clienteLogado === '5'){
+              mostrarReserva(clienteEncontrado);
+              finalizouAcaoCliente(clienteEncontrado);
+              
             }
             else {
               console.log('Não existe essa opção.')
+              rl.close()
               // tenho que colocar para perguntar de novo o número
             }
 
@@ -212,7 +212,7 @@ function fazerCadastro() {
                 var novoCliente = new Cliente(id, nome, dataNasc, cpf, email, senha);
                 clientes.push(novoCliente);
                 console.log("Cliente cadastrado com sucesso!");
-                iniciar();
+                finalizouAcaoCliente();
               });
             });
           });
@@ -222,21 +222,117 @@ function fazerCadastro() {
   }
 }
 
-function fazerReserva(){ 
+function fazerReserva(clienteEncontrado){ 
   rl.question('ID único: ', function(IdUnico){
     rl.question('ID do cliente: ', function(IdCliente){
       rl.question('Data de chek-in: ', function(DataIn){
         rl.question('Data de check-out: ', function(DataOut){
           var novaReserva = new Reserva(IdUnico, IdCliente,'Realizada', DataIn, DataOut);
-          // quando a reserva é feita o status ter ser 'realidada'
+          // quando a reserva é feita o status deve ser 'realidada'
           reservas.push(novaReserva);
           console.log("Reserva realizada com sucesso!");
-          iniciar();
+          console.log(reservas)
+          finalizouAcaoCliente(clienteEncontrado);
         })
       })
     })
   })
 
+}
+
+function mostrarReserva(clienteEncontrado){
+  for ( var i = 0; i < reservas.length; i++) {
+  // percorre cada reserva
+    if(reservas[i].IdCliente == clienteEncontrado.id){
+    // se o id do cliente na reserva for igual o id do cliente no login
+      console.log(reservas[i])
+      // imprime suas reservas
+    }
+  }
+
+}
+
+function excluirReserva(clienteEncontrado) {
+  mostrarReserva(clienteEncontrado);
+  
+  rl.question("Deseja excluir qual reserva? (Id único): ", function(idExcluir) {
+    let reservasDoCliente = [];
+
+    // Filtra as reservas que pertencem ao cliente logado
+    for (let k = 0; k < reservas.length; k++) {
+      if (reservas[k].IdCliente == clienteEncontrado.id) {
+        reservasDoCliente.push(reservas[k]);
+      }
+    }
+
+    // Verifica se o ID informado pertence a uma reserva do cliente
+    let podeExcluir = false;
+    for (let i = 0; i < reservasDoCliente.length; i++) {
+      if (reservasDoCliente[i].IdUnico == idExcluir) {
+        podeExcluir = true;
+        break;
+      }
+    }
+
+    if (podeExcluir) {
+      function manterReservasDiferentes(reserva) {
+        return reserva.IdUnico != idExcluir;
+      }
+
+      reservas = reservas.filter(manterReservasDiferentes);
+      console.log("Reserva excluída com sucesso!");
+      console.log("Lista atualizada:", reservas);
+      finalizouAcaoCliente(clienteEncontrado);
+      
+    } 
+    else {
+      console.log("Não é possível excluir essa reserva pois ela não pertence a você.");
+      finalizouAcaoCliente(clienteEncontrado);
+    }
+    
+  });
+}
+
+function finalizouAcaoCliente(clienteEncontrado){
+  rl.question('Quer sair do programa?(s/n) ', function(res){
+    if (res === 's'){
+      console.log('Programa fechado!');
+      rl.close();
+    }
+    else if (res === 'n'){
+      console.log("1. Ver Meus Dados");
+          console.log("2. Ver Lista de Quartos");
+          console.log("3. Fazer Reserva");
+          console.log("4. Cancelar Reserva");
+          console.log("5. Ver Minhas Reservas");
+          rl.question("Escolha um número: ", function(clienteLogado){
+            if (clienteLogado === '1'){
+              console.log(clienteEncontrado)
+              finalizouAcaoCliente(clienteEncontrado)
+
+            }
+            else if (clienteLogado === '2'){
+              console.log(quartocasal, quartofamilia)
+              finalizouAcaoCliente(clienteEncontrado)
+            }
+            else if (clienteLogado === '3'){
+              fazerReserva();
+            }
+            else if (clienteLogado === '4'){
+              excluirReserva(clienteEncontrado);
+            }
+            else if (clienteLogado === '5'){
+              mostrarReserva(clienteEncontrado);
+              finalizouAcaoCliente(clienteEncontrado)
+            }
+            else {
+              console.log('Não existe essa opção.')
+              finalizouAcaoCliente(clienteEncontrado)
+            }
+
+          })
+    }
+  })
 }
 
 iniciar();
