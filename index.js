@@ -21,7 +21,7 @@ let clientes = [
   new Cliente(0, "ana", "24/07/2004", "1234", "ana@email.com", "123")
 ];
 let funcionarios = [
-  new Funcionario(0, "joao", "9999", "joao@email.com", "123")
+  new Funcionario(0, "joao", "10/10/2000", "joao@email.com", "admin")
 ];
 
 // Lista com os quartos
@@ -118,12 +118,10 @@ function fazerLogin() {
                 finalizouAcaoFuncionario(funcionarioEncontrado)
             }
             else if (funcionarioLogado === '8'){
-                console.log('alterar reserva')
-                finalizouAcaoFuncionario(funcionarioEncontrado)
+                alterarStatusReserva(funcionarioEncontrado)
             }
             else if (funcionarioLogado === '9'){
-                console.log('adicionar quarto')
-                finalizouAcaoFuncionario(funcionarioEncontrado)
+                adicionarQuarto(funcionarioEncontrado)
             }
           })
         } else {
@@ -235,57 +233,38 @@ function fazerReserva(clienteEncontrado){
     var IdCliente = clienteEncontrado.id
   }
  
-      console.log(tiposDeQuartos)
-      rl.question('Qual tipo de quarto você deseja?(id Quarto) ', function(r){
-        if (r == 1){
-          console.log("Menos 1 quarto de casal!")
-          //quero descontar da quantidade de quartos de casal
-          for (var h = 0; h < tiposDeQuartos.length; h++ ){
-            
-            if (tiposDeQuartos[h].idQuarto == 1){
-              tiposDeQuartos[h].QntDisp = tiposDeQuartos[h].QntDisp - 1;
-              console.log(tiposDeQuartos[h].QntDisp);
-            }
-          }
-          rl.question("Digite a data de checkin: ", function(DataIn){
-          rl.question('Digite a data de checkout: ', function(DataOut){
-            var novaReserva = new Reserva(IdUnico, IdCliente, r, 'Realizada', DataIn, DataOut);
-            // quando a reserva é feita o status deve ser 'realizada'
-            reservas.push(novaReserva);
-            console.log("Reserva realizada com sucesso!");
-            finalizouAcaoCliente(clienteEncontrado);
+      console.log(tiposDeQuartos);
+  rl.question('Qual tipo de quarto você deseja? (id Quarto): ', function(r) {
+    function encontrarQuartoDisponivel(q) {
+    return q.idQuarto == r && q.QntDisp > 0;
+}
 
-          })
-        })
-        }  
-        else if(r==2){
-          console.log('menos um quarto família!')
-          for (var h = 0; h < tiposDeQuartos.length; h++ ){
-            
-            if (tiposDeQuartos[h].idQuarto == 2){
-              tiposDeQuartos[h].QntDisp = tiposDeQuartos[h].QntDisp - 1;
-              console.log(tiposDeQuartos[h].QntDisp);
-            }
-          }
-          rl.question("Digite a data de checkin: ", function(DataIn){
-          rl.question('Digite a data de checkout: ', function(DataOut){
-            var novaReserva = new Reserva(IdUnico, IdCliente, r, 'Realizada', DataIn, DataOut);
-            // quando a reserva é feita o status deve ser 'realizada'
-            reservas.push(novaReserva);
-            console.log("Reserva realizada com sucesso!");
-            console.log(reservas)
-            finalizouAcaoCliente(clienteEncontrado);
+  const quartoEscolhido = tiposDeQuartos.find(encontrarQuartoDisponivel);
 
-          })
-        })
 
-        }
+  if (!quartoEscolhido) {
+    console.log("Quarto não encontrado ou sem disponibilidade.");
+    return finalizouAcaoCliente(clienteEncontrado);
+  }
+
+  // Reduz a quantidade disponível
+  quartoEscolhido.QntDisp--;
+
+  console.log(`Quarto reservado.`);
+
+  rl.question("Digite a data de check-in: ", function(DataIn) {
+    rl.question("Digite a data de check-out: ", function(DataOut) {
+
+      const novaReserva = new Reserva(IdUnico, IdCliente, r, 'realizada', DataIn, DataOut);
+      reservas.push(novaReserva);
+
+      console.log("Reserva realizada com sucesso!");
+      finalizouAcaoCliente(clienteEncontrado);
+    });
+  });
+});
+
         
-        
-        })
-            
-    
-  
 
 }
 
@@ -301,46 +280,7 @@ function mostrarReserva(clienteEncontrado){
 
 }
 
-function excluirReserva(clienteEncontrado) {
-  mostrarReserva(clienteEncontrado);
-  
-  rl.question("Deseja excluir qual reserva? (Id único): ", function(idExcluir) {
-    let reservasDoCliente = [];
 
-    // Filtra as reservas que pertencem ao cliente logado
-    for (let k = 0; k < reservas.length; k++) {
-      if (reservas[k].IdCliente == clienteEncontrado.id) {
-        reservasDoCliente.push(reservas[k]);
-      }
-    }
-
-    // Verifica se o ID informado pertence a uma reserva do cliente
-    let podeExcluir = false;
-    for (let i = 0; i < reservasDoCliente.length; i++) {
-      if (reservasDoCliente[i].IdUnico == idExcluir) {
-        podeExcluir = true;
-        break;
-      }
-    }
-
-    if (podeExcluir) {
-      function manterReservasDiferentes(reserva) {
-        return reserva.IdUnico != idExcluir;
-      }
-
-      reservas = reservas.filter(manterReservasDiferentes);
-      console.log("Reserva excluída com sucesso!");
-      console.log("Lista atualizada:", reservas);
-      finalizouAcaoCliente(clienteEncontrado);
-      
-    } 
-    else {
-      console.log("Não é possível excluir essa reserva pois ela não pertence a você.");
-      finalizouAcaoCliente(clienteEncontrado);
-    }
-    
-  });
-}
 
 function finalizouAcaoCliente(clienteEncontrado){
   rl.question('Quer sair do programa?(s/n) ', function(res){
@@ -415,12 +355,10 @@ function finalizouAcaoFuncionario(funcionarioEncontrado){
                 finalizouAcaoFuncionario(funcionarioEncontrado)
             }
             else if (funcionarioLogado === '8'){
-                console.log('alterar reserva')
-                finalizouAcaoFuncionario(funcionarioEncontrado)
+                alterarStatusReserva(funcionarioEncontrado)
             }
             else if (funcionarioLogado === '9'){
-                console.log('lista de reserva')
-                finalizouAcaoFuncionario(funcionarioEncontrado)
+                adicionarQuarto(funcionarioEncontrado)
             }
           })
         } else {
@@ -430,6 +368,70 @@ function finalizouAcaoFuncionario(funcionarioEncontrado){
 
     }
   } )
+}
+
+// Função para alterar status da reserva (pendente, adiada, realizada, cancelada)
+function alterarStatusReserva(funcionarioEncontrado) {
+  console.log("Reservas atuais:");
+  console.log(reservas);
+  rl.question("Digite o ID único da reserva que deseja alterar: ", function(idAlterar) {
+    rl.question("Digite o novo status (pendente, adiada, realizada, cancelada): ", function(novoStatus) {
+      function verificarIdUnico(reserva) {
+        return reserva.IdUnico == idAlterar;
+      }
+
+      let reservaEncontrada = reservas.find(verificarIdUnico);
+
+      if (reservaEncontrada) {
+        reservaEncontrada.status = novoStatus;
+        console.log("Status da reserva alterado com sucesso!");
+        console.log(reservaEncontrada);
+      } else {
+        console.log("Reserva não encontrada.");
+      }
+      finalizouAcaoFuncionario(funcionarioEncontrado);
+    });
+  });
+}
+
+// Função para adicionar um novo quarto
+function adicionarQuarto(funcionarioEncontrado) {
+  const novoId = tiposDeQuartos.length + 1;
+  rl.question("Digite o número de camas do quarto: ", function(numero) {
+    rl.question("Digite o preço (ex: RS350): ", function(preco) {
+      rl.question("Digite a quantidade de quartos disponíveis: ", function(qntDisp) {
+        rl.question("Digite o tipo (Casal, Família, etc.): ", function(tipo) {
+          rl.question("Digite a descrição: ", function(descricao) {
+            const novoQuarto = new Quartos(novoId, numero, preco, parseInt(qntDisp), tipo, descricao);
+            tiposDeQuartos.push(novoQuarto);
+            console.log("Quarto adicionado com sucesso!");
+            console.log(novoQuarto);
+            iniciar();
+          });
+        });
+      });
+    });
+  });
+}
+
+function excluirReserva(clienteEncontrado) {
+  mostrarReserva(clienteEncontrado);
+  rl.question("Deseja cancelar qual reserva? (Id único): ", function(idCancelar) {
+    function verificarReserva(reserva) {
+      return reserva.IdUnico == idCancelar && reserva.IdCliente == clienteEncontrado.id;
+    }
+
+    let reservaEncontrada = reservas.find(verificarReserva);
+
+    if (reservaEncontrada) {
+      reservaEncontrada.status = "cancelada";
+      console.log("Reserva cancelada com sucesso!");
+      console.log("Lista atualizada:", reservas);
+    } else {
+      console.log("Reserva não encontrada ou não pertence a você.");
+    }
+    iniciar();
+  });
 }
 
 iniciar();
